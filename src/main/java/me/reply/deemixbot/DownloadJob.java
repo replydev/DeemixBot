@@ -26,16 +26,20 @@ public class DownloadJob implements Runnable{
         try {
             String dirName = job();
             FileUtils.deleteDirectory(new File(dirName));
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             logger.error("Error during download job execution: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private String job() throws IOException {
-        Runtime rt = Runtime.getRuntime();
+    private String job() throws IOException, InterruptedException {
+        //Runtime rt = Runtime.getRuntime();
         String[] commands = {"python3", "-m", "deemix","-l",link};
-        Process proc = rt.exec(commands);
+        //Process proc = rt.exec(commands);
+
+        ProcessBuilder builder = new ProcessBuilder(commands);
+        builder.redirectErrorStream(true);
+        Process proc = builder.start();
 
         BufferedReader stdInput = new BufferedReader(new
                 InputStreamReader(proc.getInputStream()));
@@ -43,11 +47,14 @@ public class DownloadJob implements Runnable{
         Vector<String> outputLines = new Vector<>();
         String s;
         while ((s = stdInput.readLine()) != null){
+            System.out.println(s);
             outputLines.add(s);
         }
         if(outputLines.isEmpty()){
             logger.error("Error during download job execution: no deemix output.");
         }
+        proc.waitFor();
+
         sendAllFiles(outputLines.lastElement());
         return outputLines.lastElement(); //last element is the dir name got by deemix
     }
@@ -69,7 +76,7 @@ public class DownloadJob implements Runnable{
             if(temp.isFile())
                 Bot.getInstance().sendDocument(temp,chat_id);
             else
-                sendAllFiles(temp.getName());
+                sendAllFiles(temp.getPath());
         }
     }
 }

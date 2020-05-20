@@ -53,8 +53,10 @@ public class Bot extends TelegramLongPollingBot {
             long chat_id = update.getMessage().getChatId();
             String user_id = update.getMessage().getFrom().getId().toString();
 
-            if(!userManager.isInList(user_id))
+            if(!userManager.isInList(user_id)){
                 userManager.addUser(new User(user_id));
+                logger.info("Added new user: " + user_id);
+            }
 
             if(commandHandler.handle(text,chat_id,user_id)) //if the user has typed a known command
                 return;
@@ -64,6 +66,12 @@ public class Bot extends TelegramLongPollingBot {
             else{
                 try {
                     DeezerApiJson deezerApiJson = Deezer.search(text);
+                    if(deezerApiJson.getTotal() <= 0){
+                        sendMessage(":x: No results...",chat_id);
+                        return;
+                    }
+                    else
+                        sendMessage(":white_check_mark: Ok buddy, i'm working on it, please wait...",chat_id);
                     SearchResult firstElement = deezerApiJson.getSearchResults()[0];
                     DownloadMode userDownloadMode = userManager.getMode(user_id);
                     switch (userDownloadMode){

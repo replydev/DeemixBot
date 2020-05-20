@@ -20,7 +20,7 @@ public class Curl {
     }
 
     public String run() throws MalformedURLException {
-        URL url = new URL(this.link);
+        URL url = new URL(this.link.replace(" ","%20"));
         StringBuilder builder = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
             for (String line; (line = reader.readLine()) != null;) {

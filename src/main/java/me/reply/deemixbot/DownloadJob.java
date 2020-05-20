@@ -73,8 +73,12 @@ public class DownloadJob implements Runnable{
         }
 
         for(File temp : files){
-            if(temp.isFile())
+            if(temp.isFile()){
+                // let's skip unwanted files
+                if(temp.getName().equalsIgnoreCase("cover.jpg") || temp.getName().equalsIgnoreCase("errors.txt"))
+                    return;
                 Bot.getInstance().sendDocument(temp,chat_id);
+            }
             else
                 sendAllFiles(temp.getPath());
         }

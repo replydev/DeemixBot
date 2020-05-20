@@ -1,8 +1,23 @@
 package me.reply.deemixbot.users;
 
-import me.reply.deemixbot.users.DownloadMode;
-
 public class User {
-    private int id;
+    private String id;
     private DownloadMode downloadMode;
+
+    public User(String id){
+        this.id = id;
+        this.downloadMode = DownloadMode.TRACK;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public DownloadMode getDownloadMode() {
+        return downloadMode;
+    }
+
+    public void setDownloadMode(DownloadMode downloadMode) {
+        this.downloadMode = downloadMode;
+    }
 }

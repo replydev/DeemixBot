@@ -1,5 +1,8 @@
 package me.reply.deemixbot;
 
+import me.reply.deemixbot.json.Deezer;
+import me.reply.deemixbot.json.DeezerApiJson;
+import me.reply.deemixbot.json.SearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -9,6 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -36,6 +40,16 @@ public class Bot extends TelegramLongPollingBot {
             long chat_id = update.getMessage().getChatId();
             if(isLink(text)){
                 executorService.submit(new DownloadJob(text,chat_id));
+            }
+            else{
+                try {
+                    DeezerApiJson deezerApiJson = Deezer.search(text);
+                    SearchResult firstElement = deezerApiJson.getSearchResults()[0];
+                    executorService.submit(new DownloadJob(firstElement.getLink(),chat_id));
+                } catch (MalformedURLException e) {
+                    logger.error(e.getMessage());
+                    e.printStackTrace();
+                }
             }
         }
     }

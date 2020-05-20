@@ -1,5 +1,6 @@
 package me.reply.deemixbot;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,14 +24,15 @@ public class DownloadJob implements Runnable{
     @Override
     public void run() {
         try {
-            job();
+            String dirName = job();
+            FileUtils.deleteDirectory(new File(dirName));
         } catch (IOException e) {
             logger.error("Error during download job execution: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void job() throws IOException {
+    private String job() throws IOException {
         Runtime rt = Runtime.getRuntime();
         String[] commands = {"python3", "-m", "deemix","-l",link};
         Process proc = rt.exec(commands);
@@ -47,6 +49,7 @@ public class DownloadJob implements Runnable{
             logger.error("Error during download job execution: no deemix output.");
         }
         sendAllFiles(outputLines.lastElement());
+        return outputLines.lastElement(); //last element is the dir name got by deemix
     }
 
     private void sendAllFiles(String dirname){

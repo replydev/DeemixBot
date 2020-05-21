@@ -22,6 +22,14 @@ public class UserManager {
         return DownloadMode.TRACK;
     }
 
+    public User getUser(String id){
+        for(User u : users){
+            if(u.getId().equalsIgnoreCase(id))
+                return u;
+        }
+        return null;
+    }
+
     public void setMode(String userId,DownloadMode downloadMode){
         for(User u : users){
             if(u.getId().equalsIgnoreCase(userId)){

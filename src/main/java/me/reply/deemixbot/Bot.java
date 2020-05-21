@@ -52,10 +52,13 @@ public class Bot extends TelegramLongPollingBot {
             long chat_id = update.getMessage().getChatId();
             String user_id = update.getMessage().getFrom().getId().toString();
 
+            User currentUser;
             if(!userManager.isInList(user_id)){
-                userManager.addUser(new User(user_id));
+                currentUser = new User(user_id);
+                userManager.addUser(currentUser);
                 logger.info("Added new user: " + user_id);
             }
+            else currentUser = userManager.getUser(user_id);
 
             if(commandHandler.handle(text,chat_id,user_id)) //if the user has typed a known command
                 return;
@@ -70,9 +73,14 @@ public class Bot extends TelegramLongPollingBot {
                         sendMessage(":x: No results...", chat_id);
                         return;
                     }
+                    else if(!currentUser.getCanType()){
+                        sendMessage(":x: You have to wait 15 seconds before make a new request.",chat_id);
+                        return;
+                    }
                     else
                         sendMessage(":white_check_mark: Ok buddy, i'm working on it, please wait...",chat_id);
 
+                    currentUser.startAntiFlood();
                     DownloadMode userDownloadMode = userManager.getMode(user_id);
                     switch (userDownloadMode){
                         case ALBUM:

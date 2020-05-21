@@ -17,9 +17,10 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.File;
-import java.net.MalformedURLException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class Bot extends TelegramLongPollingBot {
     private final Config c;
@@ -65,14 +66,15 @@ public class Bot extends TelegramLongPollingBot {
                 executorService.submit(new DownloadJob(text,chat_id));
             else{
                 try {
-                    DeezerApiJson deezerApiJson = Deezer.search(text);
-                    if(deezerApiJson.getTotal() <= 0){
-                        sendMessage(":x: No results...",chat_id);
+                    Future<SearchResult> resultFuture = executorService.submit(new JsonFetcher(text));
+                    SearchResult firstElement = resultFuture.get();
+                    if(firstElement == null) {
+                        sendMessage(":x: No results...", chat_id);
                         return;
                     }
                     else
                         sendMessage(":white_check_mark: Ok buddy, i'm working on it, please wait...",chat_id);
-                    SearchResult firstElement = deezerApiJson.getSearchResults()[0];
+
                     DownloadMode userDownloadMode = userManager.getMode(user_id);
                     switch (userDownloadMode){
                         case ALBUM:
@@ -82,7 +84,7 @@ public class Bot extends TelegramLongPollingBot {
                             executorService.submit(new DownloadJob(firstElement.getLink(),chat_id));
                             break;
                     }
-                } catch (MalformedURLException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     logger.error(e.getMessage());
                     e.printStackTrace();
                 }

@@ -62,7 +62,7 @@ public class DownloadJob implements Runnable{
         return outputLines.lastElement(); //last element is the dir name got by deemix
     }
 
-    private void sendAllFiles(String dirname){
+    private void sendAllFiles(String dirname) throws IOException {
         File dir = new File(dirname);
         if(!dir.isDirectory()){
             logger.error("Error during music sending: \"" + dirname + "\" is not a directory.");
@@ -74,12 +74,19 @@ public class DownloadJob implements Runnable{
             logger.error("Error during music sending: directory is empty.");
             return;
         }
-
+        StringBuilder errors;
         for(File temp : files){
             if(temp.isFile()){
                 // let's skip unwanted files
-                if(temp.getName().equalsIgnoreCase("cover.jpg") || temp.getName().equalsIgnoreCase("errors.txt"))
-                    return;
+                if(temp.getName().equalsIgnoreCase("cover.jpg"))
+                    continue;
+                else if(temp.getName().equalsIgnoreCase("errors.txt")){
+                    String file = FileUtils.readFileToString(temp,"UTF-8");
+                    errors = new StringBuilder();
+                    errors.append(":x: Some errors has occurred:\n").append(file);
+                    Bot.getInstance().sendMessage(errors.toString(),chat_id);
+                    continue;
+                }
                 Bot.getInstance().sendDocument(temp,chat_id);
             }
             else

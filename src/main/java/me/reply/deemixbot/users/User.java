@@ -1,7 +1,7 @@
 package me.reply.deemixbot.users;
 
 public class User {
-    private String id;
+    private final String id;
     private DownloadMode downloadMode;
 
     public User(String id){

@@ -1,5 +1,6 @@
 package me.reply.deemixbot.json;
 
+@SuppressWarnings("unused")
 public class Artist{
     private int id;
     private String name;

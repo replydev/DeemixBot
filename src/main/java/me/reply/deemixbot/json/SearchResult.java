@@ -1,6 +1,7 @@
 package me.reply.deemixbot.json;
 
 
+@SuppressWarnings("unused")
 public class SearchResult {
     private int id;
     private boolean readable;

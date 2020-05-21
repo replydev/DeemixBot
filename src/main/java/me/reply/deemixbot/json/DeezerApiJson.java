@@ -1,5 +1,6 @@
 package me.reply.deemixbot.json;
 
+@SuppressWarnings("unused")
 public class DeezerApiJson{
     private SearchResult[] data;
     private int total;

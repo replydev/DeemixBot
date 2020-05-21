@@ -4,7 +4,7 @@ import java.util.Vector;
 
 public class UserManager {
 
-    public Vector<User> users;
+    public final Vector<User> users;
 
     public UserManager(){
         users = new Vector<>();

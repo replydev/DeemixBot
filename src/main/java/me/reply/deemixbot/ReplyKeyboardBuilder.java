@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 public class ReplyKeyboardBuilder {
 
     private ReplyKeyboardBuilder() {
@@ -25,6 +26,7 @@ public class ReplyKeyboardBuilder {
         return new InlineKeyboardMarkupBuilder();
     }
 
+    @SuppressWarnings("unused")
     public static class ReplyKeyboardMarkupBuilder {
 
         private final List<KeyboardRow> keyboard = new ArrayList<>();
@@ -66,6 +68,7 @@ public class ReplyKeyboardBuilder {
         }
     }
 
+    @SuppressWarnings("unused")
     public static class InlineKeyboardMarkupBuilder {
 
         private final List<List<InlineKeyboardButton>> keyboard = new ArrayList<>();

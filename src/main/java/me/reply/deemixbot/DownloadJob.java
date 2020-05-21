@@ -15,10 +15,12 @@ public class DownloadJob implements Runnable{
     private final String link;
     private final long chat_id;
     private static final Logger logger = LoggerFactory.getLogger(DownloadJob.class);
+    private final Config c;
 
-    public DownloadJob(String link,long chat_id){
+    public DownloadJob(String link,long chat_id,Config c){
         this.link = link;
         this.chat_id = chat_id;
+        this.c = c;
     }
 
     @Override
@@ -47,7 +49,8 @@ public class DownloadJob implements Runnable{
         Vector<String> outputLines = new Vector<>();
         String s;
         while ((s = stdInput.readLine()) != null){
-            System.out.println(s);
+            if(c.isDebug_mode())
+                System.out.println(s);
             outputLines.add(s);
         }
         if(outputLines.isEmpty()){

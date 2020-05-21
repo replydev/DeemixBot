@@ -63,7 +63,7 @@ public class Bot extends TelegramLongPollingBot {
                 return;
 
             if(isLink(text))
-                executorService.submit(new DownloadJob(text,chat_id));
+                executorService.submit(new DownloadJob(text,chat_id,c));
             else{
                 try {
                     Future<SearchResult> resultFuture = executorService.submit(new JsonFetcher(text));
@@ -78,10 +78,10 @@ public class Bot extends TelegramLongPollingBot {
                     DownloadMode userDownloadMode = userManager.getMode(user_id);
                     switch (userDownloadMode){
                         case ALBUM:
-                            executorService.submit(new DownloadJob(firstElement.getAlbum().getLink(),chat_id));
+                            executorService.submit(new DownloadJob(firstElement.getAlbum().getLink(),chat_id,c));
                             break;
                         case TRACK:
-                            executorService.submit(new DownloadJob(firstElement.getLink(),chat_id));
+                            executorService.submit(new DownloadJob(firstElement.getLink(),chat_id,c));
                             break;
                     }
                 } catch (InterruptedException | ExecutionException e) {

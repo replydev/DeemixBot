@@ -70,8 +70,12 @@ public class Bot extends TelegramLongPollingBot {
 
             currentUser.startAntiFlood();
             if(isLink(text)) {
-                executorService.submit(new DownloadJob(text, chat_id, c));
-                sendMessage(":white_check_mark: I'm downloading your music please wait...",chat_id);
+                if(isCompatibleLink(text)){
+                    executorService.submit(new DownloadJob(text, chat_id, c));
+                    sendMessage(":white_check_mark: I'm downloading your music, please wait...",chat_id);
+                }
+                else
+                    sendMessage(":x: This link is not compatible.",chat_id);
             }
             else{
                 try {
@@ -82,7 +86,7 @@ public class Bot extends TelegramLongPollingBot {
                         return;
                     }
                     else
-                        sendMessage(":white_check_mark: I'm downloading your music please wait...",chat_id);
+                        sendMessage(":white_check_mark: I'm downloading your music, please wait...",chat_id);
 
                     DownloadMode userDownloadMode = userManager.getMode(user_id);
                     switch (userDownloadMode){
@@ -135,6 +139,10 @@ public class Bot extends TelegramLongPollingBot {
 
     private boolean isLink(String link){
         return link.matches("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
+    }
+
+    private boolean isCompatibleLink(String link){
+        return link.startsWith("https://www.deezer.com/") || link.startsWith("https://open.spotify.com/");
     }
 
     public void sendKeyboard(String text,long chatId){

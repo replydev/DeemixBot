@@ -6,7 +6,7 @@
 
     <groupId>me.reply.deemixbot</groupId>
     <artifactId>DeemixBot</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
 
 
     <properties>

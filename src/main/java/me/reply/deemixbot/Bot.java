@@ -63,8 +63,16 @@ public class Bot extends TelegramLongPollingBot {
             if(commandHandler.handle(text,chat_id,user_id)) //if the user has typed a known command
                 return;
 
-            if(isLink(text))
-                executorService.submit(new DownloadJob(text,chat_id,c));
+            if(!currentUser.getCanType()){
+                sendMessage(":x: You have to wait 15 seconds before make a new request.",chat_id);
+                return;
+            }
+
+            currentUser.startAntiFlood();
+            if(isLink(text)) {
+                executorService.submit(new DownloadJob(text, chat_id, c));
+                sendMessage(":white_check_mark: I'm downloading your music please wait...",chat_id);
+            }
             else{
                 try {
                     Future<SearchResult> resultFuture = executorService.submit(new JsonFetcher(text));
@@ -73,14 +81,9 @@ public class Bot extends TelegramLongPollingBot {
                         sendMessage(":x: No results...", chat_id);
                         return;
                     }
-                    else if(!currentUser.getCanType()){
-                        sendMessage(":x: You have to wait 15 seconds before make a new request.",chat_id);
-                        return;
-                    }
                     else
-                        sendMessage(":white_check_mark: Ok buddy, i'm working on it, please wait...",chat_id);
+                        sendMessage(":white_check_mark: I'm downloading your music please wait...",chat_id);
 
-                    currentUser.startAntiFlood();
                     DownloadMode userDownloadMode = userManager.getMode(user_id);
                     switch (userDownloadMode){
                         case ALBUM:

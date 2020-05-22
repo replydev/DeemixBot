@@ -54,7 +54,7 @@ public class Bot extends TelegramLongPollingBot {
 
             User currentUser;
             if(!userManager.isInList(user_id)){
-                currentUser = new User(user_id);
+                currentUser = new User(user_id,c.getAnti_flood_cooldown());
                 userManager.addUser(currentUser);
                 logger.info("Added new user: " + user_id);
             }
@@ -68,15 +68,20 @@ public class Bot extends TelegramLongPollingBot {
                 return;
             }
 
-            if(!currentUser.getCanType()){
-                sendMessage(":x: You have to wait 15 seconds before make a new request.",chat_id);
+            if(!currentUser.isCanMakeRequest()){
+                sendMessage(":x: You have to wait for DeemixBot to finish with your current request before sending another one.",chat_id);
+                return;
+            }
+
+            if(!currentUser.isCanType()){
+                sendMessage(":x: You have to wait" + c.getAnti_flood_cooldown() + " seconds before make a new request.",chat_id);
                 return;
             }
 
             currentUser.startAntiFlood();
             if(isLink(text)) {
                 if(isCompatibleLink(text)){
-                    executorService.submit(new DownloadJob(text, chat_id, c));
+                    executorService.submit(new DownloadJob(text, chat_id, c,currentUser));
                     sendMessage(":white_check_mark: I'm downloading your music, please wait...",chat_id);
                 }
                 else
@@ -96,10 +101,10 @@ public class Bot extends TelegramLongPollingBot {
                     DownloadMode userDownloadMode = userManager.getMode(user_id);
                     switch (userDownloadMode){
                         case ALBUM:
-                            executorService.submit(new DownloadJob(firstElement.getAlbum().getLink(),chat_id,c));
+                            executorService.submit(new DownloadJob(firstElement.getAlbum().getLink(),chat_id,c,currentUser));
                             break;
                         case TRACK:
-                            executorService.submit(new DownloadJob(firstElement.getLink(),chat_id,c));
+                            executorService.submit(new DownloadJob(firstElement.getLink(),chat_id,c,currentUser));
                             break;
                     }
                 } catch (InterruptedException | ExecutionException e) {

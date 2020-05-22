@@ -1,6 +1,5 @@
 package me.reply.deemixbot.users;
 
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -8,11 +7,15 @@ public class User {
     private final String id;
     private DownloadMode downloadMode;
     private boolean canType;
+    private boolean canMakeRequest;
+    private final int cooldown;
 
-    public User(String id){
+    public User(String id,int cooldown){
         this.id = id;
         this.downloadMode = DownloadMode.TRACK;
-        canType = true;
+        this.canType = true;
+        this.canMakeRequest = true;
+        this.cooldown = cooldown;
     }
 
     public String getId() {
@@ -27,12 +30,20 @@ public class User {
         this.downloadMode = downloadMode;
     }
 
+    public boolean isCanType() {
+        return canType;
+    }
+
+    public boolean isCanMakeRequest() {
+        return canMakeRequest;
+    }
+
     public void startAntiFlood(){
         canType = false;
         ExecutorService cooldownService = Executors.newSingleThreadExecutor();
         cooldownService.execute(() -> {
             try {
-                Thread.sleep(15*1000); //15 seconds
+                Thread.sleep(cooldown*1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -40,7 +51,7 @@ public class User {
         });
     }
 
-    public boolean getCanType() {
-        return canType;
+    public void setCanMakeRequest(boolean canMakeRequest) {
+        this.canMakeRequest = canMakeRequest;
     }
 }

@@ -1,5 +1,6 @@
 package me.reply.deemixbot;
 
+import me.reply.deemixbot.users.User;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,22 +17,26 @@ public class DownloadJob implements Runnable{
     private final long chat_id;
     private static final Logger logger = LoggerFactory.getLogger(DownloadJob.class);
     private final Config c;
+    private final User user;
 
     private String folderName;
     private String errors;
 
-    public DownloadJob(String link,long chat_id,Config c){
+    public DownloadJob(String link,long chat_id,Config c,User u){
         this.link = link;
         this.chat_id = chat_id;
         this.c = c;
         errors = null;
+        this.user = u;
     }
 
     @Override
     public void run() {
         try {
+            user.setCanMakeRequest(false);
             String dirName = job();
             FileUtils.deleteDirectory(new File(dirName));
+            user.setCanMakeRequest(true);
         } catch (IOException | InterruptedException e) {
             logger.error("Error during download job execution: " + e.getMessage());
             e.printStackTrace();

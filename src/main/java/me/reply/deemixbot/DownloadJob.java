@@ -17,10 +17,14 @@ public class DownloadJob implements Runnable{
     private static final Logger logger = LoggerFactory.getLogger(DownloadJob.class);
     private final Config c;
 
+    private String folderName;
+    private String errors;
+
     public DownloadJob(String link,long chat_id,Config c){
         this.link = link;
         this.chat_id = chat_id;
         this.c = c;
+        errors = null;
     }
 
     @Override
@@ -35,16 +39,13 @@ public class DownloadJob implements Runnable{
     }
 
     private String job() throws IOException, InterruptedException {
-        //Runtime rt = Runtime.getRuntime();
         String[] commands = {"python3", "-m", "deemix","-l",link};
-        //Process proc = rt.exec(commands);
-
         ProcessBuilder builder = new ProcessBuilder(commands);
         builder.redirectErrorStream(true);
-        Process proc = builder.start();
+        Process process = builder.start();
 
         BufferedReader stdInput = new BufferedReader(new
-                InputStreamReader(proc.getInputStream()));
+                InputStreamReader(process.getInputStream()));
 
         Vector<String> outputLines = new Vector<>();
         String s;
@@ -52,14 +53,17 @@ public class DownloadJob implements Runnable{
             if(c.isDebug_mode())
                 System.out.println(s);
             outputLines.add(s);
+            handleLog(s);
         }
         if(outputLines.isEmpty()){
             logger.error("Error during download job execution: no deemix output.");
         }
-        proc.waitFor();
+        process.waitFor();
 
-        sendAllFiles(outputLines.lastElement());
-        return outputLines.lastElement(); //last element is the dir name got by deemix
+        sendAllFiles(folderName); //check if we have missed something
+        if(errors != null) //check if we got some errors
+            Bot.getInstance().sendMessage(errors,chat_id);
+        return outputLines.lastElement(); //last element is the dir name got by deemix, but in this class we fetch that dynamically
     }
 
     private void sendAllFiles(String dirname) throws IOException {
@@ -74,23 +78,82 @@ public class DownloadJob implements Runnable{
             logger.error("Error during music sending: directory is empty.");
             return;
         }
-        StringBuilder errors;
         for(File temp : files){
             if(temp.isFile()){
-                // let's skip unwanted files
-                if(temp.getName().equalsIgnoreCase("cover.jpg"))
-                    continue;
-                else if(temp.getName().equalsIgnoreCase("errors.txt")){
-                    String file = FileUtils.readFileToString(temp,"UTF-8");
-                    errors = new StringBuilder();
-                    errors.append(":x: Some errors has occurred:\n").append(file);
-                    Bot.getInstance().sendMessage(errors.toString(),chat_id);
-                    continue;
-                }
-                Bot.getInstance().sendDocument(temp,chat_id);
+                sendFile(temp);
             }
             else
                 sendAllFiles(temp.getPath());
         }
+    }
+
+    private void sendFile(File d) throws IOException {
+        if(!d.isDirectory()){
+            // let's skip unwanted files
+            if(d.getName().equalsIgnoreCase("cover.jpg"))
+                return;
+            // and save the errors
+            else if(d.getName().equalsIgnoreCase("errors.txt")){
+                errors = ":x: Some errors has occurred:\n" + FileUtils.readFileToString(d,"UTF-8");
+                return;
+            }
+            Bot.getInstance().sendDocument(d,chat_id);
+            FileUtils.forceDelete(d);
+        }
+        else
+            sendAllFiles(d.getPath());
+    }
+
+    private void handleLog(String line){
+        // INFO:deemix:[Max Romeo - Crackling Rosie] Track download completed
+        // INFO:deemix:[track_930652662_3] Finished downloading.
+        if(line.contains("Track download completed")){ // a song has been downloaded by deemix
+            String trackName = line.substring(line.indexOf('[') + 1, line.lastIndexOf(']'));
+            File trackFile = findFile(trackName); //Remember this when implementing FLAC files
+            if(trackFile == null)  //if we did'nt find the file
+                return;
+            logger.info("New file downloaded: " + trackFile.getPath());
+            try {
+                sendFile(trackFile);
+            } catch (IOException e) {
+                logger.error(e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        //INFO:deemix:Using a local download folder: tchgmfqtklza
+        else if(line.contains("Using a local download folder")){ //we can fetch the folder name
+            folderName = line.substring(line.lastIndexOf(':') + 2);
+            logger.info("Fetched a new folder: " + folderName);
+        }
+    }
+
+    private File findFile(String filename){
+        String trackName = filename.substring(filename.indexOf('-') + 2);
+        File dir = new File(folderName);
+        Vector<File> files = getAllFiles(dir);
+        if(files == null)
+            return null;
+        for(File f : files){
+            if(f.getName().contains(trackName)){
+                return f;
+            }
+        }
+        return null;
+    }
+
+    private Vector<File> getAllFiles(File dir){
+        File[] files = dir.listFiles();
+
+        if(files == null)
+            return null;
+        Vector<File> trueFiles = new Vector<>();
+
+        for(File temp : files){
+            if(temp.isFile())
+                trueFiles.add(temp);
+            else
+                trueFiles.addAll(getAllFiles(temp));
+        }
+        return trueFiles;
     }
 }

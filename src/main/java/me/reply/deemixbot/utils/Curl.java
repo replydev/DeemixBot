@@ -1,4 +1,4 @@
-package me.reply.deemixbot;
+package me.reply.deemixbot.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,13 +14,15 @@ public class Curl {
 
     private final String link;
     private static final Logger logger = LoggerFactory.getLogger(Curl.class);
+    private final String query;
 
-    public Curl(String url){
+    public Curl(String url,String query){
         this.link = url;
+        this.query = URLUTF8Encoder.encode(query);
     }
 
     public String run() throws MalformedURLException {
-        URL url = new URL(this.link.replace(" ","%20"));
+        URL url = new URL(link + query);
         StringBuilder builder = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8))) {
             for (String line; (line = reader.readLine()) != null;) {

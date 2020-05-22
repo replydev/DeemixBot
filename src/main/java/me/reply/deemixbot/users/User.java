@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 public class User {
     private final String id;
     private DownloadMode downloadMode;
-    private Boolean canType;
+    private boolean canType;
 
     public User(String id){
         this.id = id;
@@ -40,7 +40,7 @@ public class User {
         });
     }
 
-    public Boolean getCanType() {
+    public boolean getCanType() {
         return canType;
     }
 }

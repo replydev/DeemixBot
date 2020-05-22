@@ -63,6 +63,11 @@ public class Bot extends TelegramLongPollingBot {
             if(commandHandler.handle(text,chat_id,user_id)) //if the user has typed a known command
                 return;
 
+            if(text.startsWith("/")){
+                sendMessage(":x: Unknown command.",chat_id);
+                return;
+            }
+
             if(!currentUser.getCanType()){
                 sendMessage(":x: You have to wait 15 seconds before make a new request.",chat_id);
                 return;

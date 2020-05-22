@@ -17,6 +17,8 @@ public class JsonFetcher implements Callable<SearchResult> {
     @Override
     public SearchResult call() throws Exception {
         DeezerApiJson deezerApiJson = Deezer.search(text);
+        if(deezerApiJson == null)
+            return null;
         if(deezerApiJson.getTotal() <= 0){
             return null;
         }

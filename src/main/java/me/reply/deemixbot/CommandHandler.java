@@ -7,6 +7,8 @@ public class CommandHandler {
 
     // This method returns true if the user has typed a known command
     public boolean handle(String text,long chat_id,String userid){
+        if(text == null || userid == null)
+            return false;
         switch(EmojiParser.parseToAliases(text)){
             case "/start":
                 Bot.getInstance().sendKeyboard("Hi, welcome to Deemixbot :musical_note:, i'm here to spread the music all over the world :earth_africa:",chat_id);

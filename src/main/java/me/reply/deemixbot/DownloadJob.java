@@ -104,7 +104,7 @@ public class DownloadJob implements Runnable{
                 errors = ":x: Some errors has occurred:\n" + FileUtils.readFileToString(d,"UTF-8");
                 return;
             }
-            Bot.getInstance().sendDocument(d,chat_id);
+            Bot.getInstance().sendDocument(d,chat_id,":star: @" + c.getBot_username());
             FileUtils.forceDelete(d);
         }
         else

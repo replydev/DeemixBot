@@ -135,10 +135,11 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    public void sendDocument(File f,long chat_id){
+    public void sendDocument(File f,long chat_id,String text){
         SendDocument document = new SendDocument()
                 .setDocument(f)
-                .setChatId(chat_id);
+                .setChatId(chat_id)
+                .setCaption(EmojiParser.parseToUnicode(text));
         try {
             execute(document);
         } catch (TelegramApiException e) {

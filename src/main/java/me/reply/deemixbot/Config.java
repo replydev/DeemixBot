@@ -33,8 +33,8 @@ public class Config {
     private static void saveDefaultConfig() throws IOException {
         String defaultConfig = "{\n" +
                 "  \"bot_token\": \"token_here\",\n" +
-                "  \"bot_username\": \"username_here\"\n" +
-                "  \"anti_flood_cooldown\": 5\n" +
+                "  \"bot_username\": \"username_here\",\n" +
+                "  \"anti_flood_cooldown\": 5,\n" +
                 "  \"debug_mode\": false\n" +
                 "}";
         FileUtils.write(new File(CONFIG_FILENAME),defaultConfig,"UTF-8");

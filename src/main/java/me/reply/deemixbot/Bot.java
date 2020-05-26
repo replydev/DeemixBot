@@ -164,6 +164,9 @@ public class Bot extends TelegramLongPollingBot {
                 .addText(EmojiParser.parseToUnicode(":cd: Track mode"))
                 .addText(EmojiParser.parseToUnicode(":notebook_with_decorative_cover: Album mode"))
                 .row()
+                .addText(EmojiParser.parseToUnicode(":large_blue_diamond: Flac"))
+                .addText(EmojiParser.parseToUnicode(":large_orange_diamond: MP3"))
+                .row()
                 .addText(EmojiParser.parseToUnicode(":computer: Source code"))
                 .build();
 

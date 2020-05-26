@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 public class User {
     private final String id;
     private DownloadMode downloadMode;
+    private DownloadFormat downloadFormat;
     private boolean canType;
     private boolean canMakeRequest;
     private final int cooldown;
@@ -13,6 +14,7 @@ public class User {
     public User(String id,int cooldown){
         this.id = id;
         this.downloadMode = DownloadMode.TRACK;
+        this.downloadFormat = DownloadFormat.MP3;
         this.canType = true;
         this.canMakeRequest = true;
         this.cooldown = cooldown;
@@ -24,6 +26,10 @@ public class User {
 
     public DownloadMode getDownloadMode() {
         return downloadMode;
+    }
+
+    public DownloadFormat getDownloadFormat() {
+        return downloadFormat;
     }
 
     public void setDownloadMode(DownloadMode downloadMode) {
@@ -53,5 +59,9 @@ public class User {
 
     public void setCanMakeRequest(boolean canMakeRequest) {
         this.canMakeRequest = canMakeRequest;
+    }
+
+    public void setDownloadFormat(DownloadFormat downloadFormat) {
+        this.downloadFormat = downloadFormat;
     }
 }

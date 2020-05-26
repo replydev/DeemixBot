@@ -1,13 +1,14 @@
 package me.reply.deemixbot;
 
 import com.vdurmont.emoji.EmojiParser;
+import me.reply.deemixbot.users.DownloadFormat;
 import me.reply.deemixbot.users.DownloadMode;
 
 public class CommandHandler {
 
     // This method returns true if the user has typed a known command
-    public boolean handle(String text,long chat_id,String userid){
-        if(text == null || userid == null)
+    public boolean handle(String text,long chat_id,String userId){
+        if(text == null || userId == null)
             return false;
         switch(EmojiParser.parseToAliases(text)){
             case "/start":
@@ -15,12 +16,20 @@ public class CommandHandler {
                 Bot.getInstance().sendMessage("To start, just type a song or album name",chat_id);
                 return true;
             case ":cd: Track mode":
-                Bot.getInstance().getUserManager().setMode(userid, DownloadMode.TRACK);
-                Bot.getInstance().sendMessage("Track mode set successfully! :cd:",chat_id);
+                Bot.getInstance().getUserManager().setMode(userId, DownloadMode.TRACK);
+                Bot.getInstance().sendMessage("Track mode enabled! :cd:",chat_id);
                 return true;
             case ":notebook_with_decorative_cover: Album mode":
-                Bot.getInstance().getUserManager().setMode(userid, DownloadMode.ALBUM);
-                Bot.getInstance().sendMessage("Album mode set successfully! :notebook_with_decorative_cover:",chat_id);
+                Bot.getInstance().getUserManager().setMode(userId, DownloadMode.ALBUM);
+                Bot.getInstance().sendMessage("Album mode enabled! :notebook_with_decorative_cover:",chat_id);
+                return true;
+            case ":large_blue_diamond: Flac":
+                Bot.getInstance().getUserManager().setFormat(userId, DownloadFormat.FLAC);
+                Bot.getInstance().sendMessage("Flac mode enabled! :large_blue_diamond:",chat_id);
+                return true;
+            case ":large_orange_diamond: MP3":
+                Bot.getInstance().getUserManager().setFormat(userId, DownloadFormat.MP3);
+                Bot.getInstance().sendMessage("MP3 mode enabled! :large_orange_diamond:",chat_id);
                 return true;
             case ":computer: Source code":
                 Bot.getInstance().sendMessage(":smile_cat: Developed by @zreply. Thanks a lot to Deemix developer for make this possible. \n:page_facing_up: The source code of this bot is open source, feel free to check, any pull request is welcome!\n:link: https://github.com/replydev/DeemixBot\n:link:https://notabug.org/RemixDev/deemix",chat_id);
@@ -28,6 +37,4 @@ public class CommandHandler {
             default: return false;
         }
     }
-
-
 }

@@ -1,5 +1,6 @@
 package me.reply.deemixbot;
 
+import me.reply.deemixbot.users.DownloadFormat;
 import me.reply.deemixbot.users.User;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -46,7 +47,8 @@ public class DownloadJob implements Runnable{
     }
 
     private String job() throws IOException, InterruptedException {
-        String[] commands = {"python3", "-m", "deemix","-l",link};
+        String[] commands = user.getDownloadFormat().equals(DownloadFormat.FLAC) ?
+                new String[]{"python3", "-m", "deemix", "-b", "flac", "-l", link} : new String[]{"python3", "-m", "deemix", "-l", link};
         ProcessBuilder builder = new ProcessBuilder(commands);
         builder.redirectErrorStream(true);
         Process process = builder.start();

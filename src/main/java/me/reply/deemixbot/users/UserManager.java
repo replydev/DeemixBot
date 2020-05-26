@@ -38,6 +38,13 @@ public class UserManager {
         }
     }
 
+    public void setFormat(String userId,DownloadFormat downloadFormat){
+        for(User u : users){
+            if(u.getId().equalsIgnoreCase(userId)){
+                u.setDownloadFormat(downloadFormat);
+            }
+        }
+    }
 
     public boolean isInList(String userId){
         for(User u : users){

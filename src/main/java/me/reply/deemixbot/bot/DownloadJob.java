@@ -1,4 +1,4 @@
-package me.reply.deemixbot;
+package me.reply.deemixbot.bot;
 
 import me.reply.deemixbot.users.DownloadFormat;
 import me.reply.deemixbot.users.User;

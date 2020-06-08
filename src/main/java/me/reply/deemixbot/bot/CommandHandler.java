@@ -1,6 +1,7 @@
-package me.reply.deemixbot;
+package me.reply.deemixbot.bot;
 
 import com.vdurmont.emoji.EmojiParser;
+import me.reply.deemixbot.bot.Bot;
 import me.reply.deemixbot.users.DownloadFormat;
 import me.reply.deemixbot.users.DownloadMode;
 

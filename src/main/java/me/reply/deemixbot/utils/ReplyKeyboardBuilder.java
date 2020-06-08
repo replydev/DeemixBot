@@ -1,4 +1,4 @@
-package me.reply.deemixbot;
+package me.reply.deemixbot.utils;
 
 import org.telegram.telegrambots.meta.api.objects.LoginUrl;
 import org.telegram.telegrambots.meta.api.objects.games.CallbackGame;

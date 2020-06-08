@@ -1,5 +1,7 @@
 package me.reply.deemixbot;
 
+import me.reply.deemixbot.bot.Bot;
+import me.reply.deemixbot.bot.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.ApiContextInitializer;

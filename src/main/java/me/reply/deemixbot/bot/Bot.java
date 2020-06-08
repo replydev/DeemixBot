@@ -1,10 +1,11 @@
-package me.reply.deemixbot;
+package me.reply.deemixbot.bot;
 
 import com.vdurmont.emoji.EmojiParser;
 import me.reply.deemixbot.api.SearchResult;
 import me.reply.deemixbot.users.DownloadMode;
 import me.reply.deemixbot.users.User;
 import me.reply.deemixbot.users.UserManager;
+import me.reply.deemixbot.utils.ReplyKeyboardBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;

@@ -1,4 +1,4 @@
-package me.reply.deemixbot;
+package me.reply.deemixbot.bot;
 
 import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;

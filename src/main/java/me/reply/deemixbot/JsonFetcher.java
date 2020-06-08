@@ -1,8 +1,8 @@
 package me.reply.deemixbot;
 
-import me.reply.deemixbot.json.Deezer;
-import me.reply.deemixbot.json.DeezerApiJson;
-import me.reply.deemixbot.json.SearchResult;
+import me.reply.deemixbot.api.Deezer;
+import me.reply.deemixbot.api.DeezerApiJson;
+import me.reply.deemixbot.api.SearchResult;
 
 import java.util.concurrent.Callable;
 

@@ -1,7 +1,7 @@
 package me.reply.deemixbot;
 
 import com.vdurmont.emoji.EmojiParser;
-import me.reply.deemixbot.json.SearchResult;
+import me.reply.deemixbot.api.SearchResult;
 import me.reply.deemixbot.users.DownloadMode;
 import me.reply.deemixbot.users.User;
 import me.reply.deemixbot.users.UserManager;

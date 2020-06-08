@@ -1,4 +1,4 @@
-package me.reply.deemixbot.json;
+package me.reply.deemixbot.api;
 
 import com.google.gson.Gson;
 import me.reply.deemixbot.utils.Curl;

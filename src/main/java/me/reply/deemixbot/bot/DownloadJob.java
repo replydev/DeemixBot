@@ -119,7 +119,7 @@ public class DownloadJob implements Runnable{
         if(line.contains("Track download completed")){ // a song has been downloaded by deemix
             String trackName = line.substring(line.indexOf('[') + 1, line.lastIndexOf(']'));
             File trackFile = findFile(trackName); //Remember this when implementing FLAC files
-            if(trackFile == null)  //if we did'nt find the file
+            if(trackFile == null)  //if we didn't find the file
                 return;
             logger.info("New file downloaded: " + trackFile.getPath());
             try {

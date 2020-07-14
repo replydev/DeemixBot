@@ -1,7 +1,9 @@
 package me.reply.deemixbot.bot;
 
 import com.vdurmont.emoji.EmojiParser;
+import com.wrapper.spotify.model_objects.specification.Playlist;
 import me.reply.deemixbot.api.SearchResult;
+import me.reply.deemixbot.spotify.SpotifyPlaylistChecker;
 import me.reply.deemixbot.users.DownloadMode;
 import me.reply.deemixbot.users.User;
 import me.reply.deemixbot.users.UserManager;
@@ -77,18 +79,25 @@ public class Bot extends TelegramLongPollingBot {
             }
 
             if(!currentUser.isCanType()){
-                sendMessage(":x: You have to wait" + c.getAnti_flood_cooldown() + " seconds before make a new request.",chat_id);
+                sendMessage(":x: You have to wait " + c.getAnti_flood_cooldown() + " seconds before make a new request.",chat_id);
                 return;
             }
 
             currentUser.startAntiFlood();
             if(isLink(text)) {
-                if(isCompatibleLink(text)){
-                    executorService.submit(new DownloadJob(text, chat_id, c,currentUser));
-                    sendMessage(":white_check_mark: I'm downloading your music, please wait...",chat_id);
+                if(isSpotifyLink(text)){
+                    SpotifyPlaylistChecker spotifyPlaylistChecker = new SpotifyPlaylistChecker(text,c);
+                    if(!spotifyPlaylistChecker.isReasonable()){
+                        sendMessage(":x: Playlist contains too many tracks, only 100 or less are supported.",chat_id);
+                        return;
+                    }
                 }
-                else
+                else if(!isDeezerLink(text)){
                     sendMessage(":x: This link is not compatible.",chat_id);
+                    return;
+                }
+                executorService.submit(new DownloadJob(text, chat_id, c,currentUser));
+                sendMessage(":white_check_mark: I'm downloading your music, please wait...",chat_id);
             }
             else{
                 try {
@@ -155,8 +164,13 @@ public class Bot extends TelegramLongPollingBot {
         return link.matches("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
     }
 
-    private boolean isCompatibleLink(String link){
-        return link.startsWith("https://www.deezer.com/") || link.startsWith("https://open.spotify.com/");
+    private boolean isDeezerLink(String link){
+        return link.startsWith("https://www.deezer.com/");
+    }
+
+    private boolean isSpotifyLink(String link){
+        return link.contains("open.spotify.com");
+        // return link.startsWith("https://open.spotify.com/");
     }
 
     public void sendKeyboard(String text,long chatId){

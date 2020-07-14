@@ -8,13 +8,26 @@ import java.io.IOException;
 
 public class Config {
 
+    private final String spotify_client_id;
+    private final String spotify_client_secret;
+    private final int max_spotify_tracks;
     private final String bot_token;
     private final String bot_username;
     private final int anti_flood_cooldown;
     private final boolean debug_mode;
     private static final String CONFIG_FILENAME = "deemix_bot_config.json";
 
-    private Config(String bot_token,String bot_username,int anti_flood_cooldown,boolean debug_mode){
+    private Config(String spotify_client_id,
+                   String spotify_client_secret,
+                   int max_spotify_tracks,
+                   String bot_token,
+                   String bot_username,
+                   int anti_flood_cooldown,
+                   boolean debug_mode
+    ){
+        this.spotify_client_id = spotify_client_id;
+        this.spotify_client_secret = spotify_client_secret;
+        this.max_spotify_tracks = max_spotify_tracks;
         this.bot_token = bot_token;
         this.bot_username = bot_username;
         this.anti_flood_cooldown = anti_flood_cooldown;
@@ -32,12 +45,27 @@ public class Config {
 
     private static void saveDefaultConfig() throws IOException {
         String defaultConfig = "{\n" +
-                "  \"bot_token\": \"token_here\",\n" +
-                "  \"bot_username\": \"username_here\",\n" +
+                "  \"spotify_client_id\": \"spotify_client_id_here\",\n" +
+                "  \"spotify_client_secret\": \"spotify_client_secret_here\",\n" +
+                "  \"max_spotify_tracks\" : 100,\n" +
+                "  \"bot_token\": \"bot_token_here\",\n" +
+                "  \"bot_username\": \"bot_username_here\",\n" +
                 "  \"anti_flood_cooldown\": 5,\n" +
                 "  \"debug_mode\": false\n" +
                 "}";
         FileUtils.write(new File(CONFIG_FILENAME),defaultConfig,"UTF-8");
+    }
+
+    public String getSpotifyClientId() {
+        return spotify_client_id;
+    }
+
+    public String getSpotify_client_secret(){
+        return spotify_client_secret;
+    }
+
+    public int getMax_spotify_tracks() {
+        return max_spotify_tracks;
     }
 
     public String getBot_token() {

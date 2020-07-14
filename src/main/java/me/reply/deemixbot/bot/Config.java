@@ -15,8 +15,13 @@ public class Config {
     private final String bot_username;
     private final int anti_flood_cooldown;
     private final int kill_python_process_cooldown;
+    private final String python_executable;
     private final boolean debug_mode;
     private static final String CONFIG_FILENAME = "deemix_bot_config.json";
+
+    public String getPython_executable() {
+        return python_executable;
+    }
 
     private Config(String spotify_client_id,
                    String spotify_client_secret,
@@ -24,6 +29,7 @@ public class Config {
                    String bot_token,
                    String bot_username,
                    int kill_python_process_cooldown,
+                   String python_executable,
                    int anti_flood_cooldown,
                    boolean debug_mode
     ){
@@ -33,6 +39,7 @@ public class Config {
         this.bot_token = bot_token;
         this.bot_username = bot_username;
         this.kill_python_process_cooldown = kill_python_process_cooldown;
+        this.python_executable = python_executable;
         this.anti_flood_cooldown = anti_flood_cooldown;
         this.debug_mode = debug_mode;
     }
@@ -54,7 +61,8 @@ public class Config {
                 "  \"bot_token\": \"bot_token_here\",\n" +
                 "  \"bot_username\": \"bot_username_here\",\n" +
                 "  \"kill_python_process_cooldown\": 5000,\n" +
-                "  \"anti_flood_cooldown\": 5,\n" +
+                "  \"python_executable\": 5000,\n" +
+                "  \"anti_flood_cooldown\": \"python3\",\n" +
                 "  \"debug_mode\": false\n" +
                 "}";
         FileUtils.write(new File(CONFIG_FILENAME),defaultConfig,"UTF-8");

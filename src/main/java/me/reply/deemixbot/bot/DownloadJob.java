@@ -52,7 +52,7 @@ public class DownloadJob implements Runnable{
     private String job() throws IOException, InterruptedException {
         // Create the process
         String[] commands = user.getDownloadFormat().equals(DownloadFormat.FLAC) ?
-                new String[]{"python3", "-m", "deemix", "-b", "flac", "-l", link} : new String[]{"python3", "-m", "deemix", "-l", link};
+                new String[]{c.getPython_executable(), "-m", "deemix", "-b", "flac", "-l", link} : new String[]{c.getPython_executable(), "-m", "deemix", "-l", link};
         ProcessBuilder builder = new ProcessBuilder(commands);
         builder.redirectErrorStream(true);
         process = builder.start();

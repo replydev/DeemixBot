@@ -111,7 +111,7 @@ public class DownloadJob implements Runnable{
                 return;
             }
             downloadedSongs++;
-            Bot.getInstance().sendDocument(d,chat_id,":star: @" + c.getBot_username());
+            Bot.getInstance().sendAudio(d,chat_id,":star: @" + c.getBot_username());
             FileUtils.forceDelete(d);
             if(downloadedSongs >= c.getMax_playlist_tracks()){  //if the user requested too many songs
                 new Thread(() -> process.destroy()).start();  // try to kill the process lightly

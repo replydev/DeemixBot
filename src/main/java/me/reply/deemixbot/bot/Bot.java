@@ -11,6 +11,7 @@ import me.reply.deemixbot.utils.ReplyKeyboardBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -147,6 +148,7 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
+    @Deprecated
     public void sendDocument(File f,long chat_id,String text){
         SendDocument document = new SendDocument()
                 .setDocument(f)
@@ -154,6 +156,19 @@ public class Bot extends TelegramLongPollingBot {
                 .setCaption(EmojiParser.parseToUnicode(text));
         try {
             execute(document);
+        } catch (TelegramApiException e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void sendAudio(File f,long chat_id,String text){
+        SendAudio audio = new SendAudio()
+                .setAudio(f)
+                .setChatId(chat_id)
+                .setCaption(EmojiParser.parseToUnicode(text));
+        try {
+            execute(audio);
         } catch (TelegramApiException e) {
             logger.error(e.getMessage());
             e.printStackTrace();

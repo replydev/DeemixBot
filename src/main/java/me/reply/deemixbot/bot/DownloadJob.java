@@ -19,6 +19,8 @@ public class DownloadJob implements Runnable{
     private static final Logger logger = LoggerFactory.getLogger(DownloadJob.class);
     private final Config c;
     private final User user;
+    private int downloadedSongs;
+    private Process process;
 
     private String folderName;
     private String errors;
@@ -29,6 +31,7 @@ public class DownloadJob implements Runnable{
         this.c = c;
         errors = null;
         this.user = u;
+        downloadedSongs = 0;
     }
 
     @Override
@@ -47,35 +50,36 @@ public class DownloadJob implements Runnable{
     }
 
     private String job() throws IOException, InterruptedException {
+        // Create the process
         String[] commands = user.getDownloadFormat().equals(DownloadFormat.FLAC) ?
                 new String[]{"python3", "-m", "deemix", "-b", "flac", "-l", link} : new String[]{"python3", "-m", "deemix", "-l", link};
         ProcessBuilder builder = new ProcessBuilder(commands);
         builder.redirectErrorStream(true);
-        Process process = builder.start();
+        process = builder.start();
 
+        // Fetch deemix output using the process object
+        boolean hasOutput = false;
         BufferedReader stdInput = new BufferedReader(new
                 InputStreamReader(process.getInputStream()));
-
-        Vector<String> outputLines = new Vector<>();
         String s;
         while ((s = stdInput.readLine()) != null){
             if(c.isDebug_mode())
                 System.out.println(s);
-            outputLines.add(s);
             handleLog(s);
+            hasOutput = true;
         }
-        if(outputLines.isEmpty()){
+
+        if(!hasOutput){
             logger.error("Error during download job execution: no deemix output.");
         }
-        process.waitFor();
-
+        process.waitFor();// now the program can stop the process if the user has requested a playlist bigger than x tracks
         sendAllFiles(folderName); //check if we have missed something
         if(errors != null) //check if we got some errors
             Bot.getInstance().sendMessage(errors,chat_id);
-        return outputLines.lastElement(); //last element is the dir name got by deemix, but in this class we fetch that dynamically
+        return folderName;
     }
 
-    private void sendAllFiles(String dirname) throws IOException {
+    private void sendAllFiles(String dirname) throws IOException, InterruptedException {
         File dir = new File(dirname);
         if(!dir.isDirectory()){
             logger.error("Error during music sending: \"" + dirname + "\" is not a directory.");
@@ -96,7 +100,7 @@ public class DownloadJob implements Runnable{
         }
     }
 
-    private void sendFile(File d) throws IOException {
+    private void sendFile(File d) throws IOException, InterruptedException {
         if(!d.isDirectory()){
             // let's skip unwanted files
             if(d.getName().equalsIgnoreCase("cover.jpg"))
@@ -106,16 +110,21 @@ public class DownloadJob implements Runnable{
                 errors = ":x: Some errors has occurred:\n" + FileUtils.readFileToString(d,"UTF-8");
                 return;
             }
+            downloadedSongs++;
             Bot.getInstance().sendDocument(d,chat_id,":star: @" + c.getBot_username());
             FileUtils.forceDelete(d);
+            if(downloadedSongs >= c.getMax_playlist_tracks()){  //if the user requested too many songs
+                new Thread(() -> process.destroy()).start();  // try to kill the process lightly
+                Thread.sleep(c.getKill_python_process_cooldown()); // wait some time
+                if(process.isAlive())
+                    process.destroyForcibly();  // if it's still alive destroy the process
+            }
         }
         else
             sendAllFiles(d.getPath());
     }
 
     private void handleLog(String line){
-        // INFO:deemix:[Max Romeo - Crackling Rosie] Track download completed
-        // INFO:deemix:[track_930652662_3] Finished downloading.
         if(line.contains("Track download completed")){ // a song has been downloaded by deemix
             String trackName = line.substring(line.indexOf('[') + 1, line.lastIndexOf(']'));
             File trackFile = findFile(trackName); //Remember this when implementing FLAC files
@@ -124,7 +133,7 @@ public class DownloadJob implements Runnable{
             logger.info("New file downloaded: " + trackFile.getPath());
             try {
                 sendFile(trackFile);
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 logger.error(e.getMessage());
                 e.printStackTrace();
             }

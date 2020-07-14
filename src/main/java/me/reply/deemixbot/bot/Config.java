@@ -14,6 +14,7 @@ public class Config {
     private final String bot_token;
     private final String bot_username;
     private final int anti_flood_cooldown;
+    private final int kill_python_process_cooldown;
     private final boolean debug_mode;
     private static final String CONFIG_FILENAME = "deemix_bot_config.json";
 
@@ -22,6 +23,7 @@ public class Config {
                    int max_playlist_tracks,
                    String bot_token,
                    String bot_username,
+                   int kill_python_process_cooldown,
                    int anti_flood_cooldown,
                    boolean debug_mode
     ){
@@ -30,6 +32,7 @@ public class Config {
         this.max_playlist_tracks = max_playlist_tracks;
         this.bot_token = bot_token;
         this.bot_username = bot_username;
+        this.kill_python_process_cooldown = kill_python_process_cooldown;
         this.anti_flood_cooldown = anti_flood_cooldown;
         this.debug_mode = debug_mode;
     }
@@ -47,9 +50,10 @@ public class Config {
         String defaultConfig = "{\n" +
                 "  \"spotify_client_id\": \"spotify_client_id_here\",\n" +
                 "  \"spotify_client_secret\": \"spotify_client_secret_here\",\n" +
-                "  \"max_playlist_tracks\" : 100,\n" +
+                "  \"max_playlist_tracks\": 100,\n" +
                 "  \"bot_token\": \"bot_token_here\",\n" +
                 "  \"bot_username\": \"bot_username_here\",\n" +
+                "  \"kill_python_process_cooldown\": 5000,\n" +
                 "  \"anti_flood_cooldown\": 5,\n" +
                 "  \"debug_mode\": false\n" +
                 "}";
@@ -82,5 +86,9 @@ public class Config {
 
     public int getAnti_flood_cooldown() {
         return anti_flood_cooldown;
+    }
+
+    public int getKill_python_process_cooldown() {
+        return kill_python_process_cooldown;
     }
 }

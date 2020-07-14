@@ -34,7 +34,7 @@ public class SpotifyPlaylistChecker {
     public boolean isReasonable(){
         try {
             final Playlist playlist = getPlaylistRequest.execute();
-            return playlist.getTracks().getTotal() <= c.getMax_spotify_tracks();
+            return playlist.getTracks().getTotal() <= c.getMax_playlist_tracks();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             logger.error(e.getMessage());
             return false;

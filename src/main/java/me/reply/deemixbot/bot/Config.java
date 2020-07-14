@@ -10,7 +10,7 @@ public class Config {
 
     private final String spotify_client_id;
     private final String spotify_client_secret;
-    private final int max_spotify_tracks;
+    private final int max_playlist_tracks;
     private final String bot_token;
     private final String bot_username;
     private final int anti_flood_cooldown;
@@ -19,7 +19,7 @@ public class Config {
 
     private Config(String spotify_client_id,
                    String spotify_client_secret,
-                   int max_spotify_tracks,
+                   int max_playlist_tracks,
                    String bot_token,
                    String bot_username,
                    int anti_flood_cooldown,
@@ -27,7 +27,7 @@ public class Config {
     ){
         this.spotify_client_id = spotify_client_id;
         this.spotify_client_secret = spotify_client_secret;
-        this.max_spotify_tracks = max_spotify_tracks;
+        this.max_playlist_tracks = max_playlist_tracks;
         this.bot_token = bot_token;
         this.bot_username = bot_username;
         this.anti_flood_cooldown = anti_flood_cooldown;
@@ -47,7 +47,7 @@ public class Config {
         String defaultConfig = "{\n" +
                 "  \"spotify_client_id\": \"spotify_client_id_here\",\n" +
                 "  \"spotify_client_secret\": \"spotify_client_secret_here\",\n" +
-                "  \"max_spotify_tracks\" : 100,\n" +
+                "  \"max_playlist_tracks\" : 100,\n" +
                 "  \"bot_token\": \"bot_token_here\",\n" +
                 "  \"bot_username\": \"bot_username_here\",\n" +
                 "  \"anti_flood_cooldown\": 5,\n" +
@@ -64,8 +64,8 @@ public class Config {
         return spotify_client_secret;
     }
 
-    public int getMax_spotify_tracks() {
-        return max_spotify_tracks;
+    public int getMax_playlist_tracks() {
+        return max_playlist_tracks;
     }
 
     public String getBot_token() {

@@ -3,6 +3,7 @@ package me.reply.deemixbot.bot;
 import com.vdurmont.emoji.EmojiParser;
 import me.reply.deemixbot.api.SearchResult;
 import me.reply.deemixbot.spotify.SpotifyPlaylistChecker;
+import me.reply.deemixbot.users.DownloadMode;
 import me.reply.deemixbot.users.User;
 import me.reply.deemixbot.users.UserManager;
 import me.reply.deemixbot.utils.ReplyKeyboardBuilder;
@@ -117,6 +118,32 @@ public class Bot extends TelegramLongPollingBot {
                 }
                 executorService.submit(new DownloadJob(text, chat_id, c,currentUser));
                 sendMessage(":white_check_mark: I'm downloading your music, please wait...",chat_id);
+            }
+            else{
+                try {
+                    Future<SearchResult[]> resultFuture = executorService.submit(new JsonFetcher(text));
+                    SearchResult[] results = resultFuture.get();
+                    if(results == null) {
+                        sendMessage(":x: No results...", chat_id);
+                        return;
+                    }
+                    else
+                        sendMessage(":white_check_mark: I'm downloading your music, please wait...",chat_id);
+
+                    SearchResult firstElement = results[0];
+                    DownloadMode userDownloadMode = userManager.getMode(user_id);
+                    switch (userDownloadMode){
+                        case ALBUM:
+                            executorService.submit(new DownloadJob(firstElement.getAlbum().getLink(),chat_id,c,currentUser));
+                            break;
+                        case TRACK:
+                            executorService.submit(new DownloadJob(firstElement.getLink(),chat_id,c,currentUser));
+                            break;
+                    }
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.error(e.getMessage());
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -235,19 +262,26 @@ public class Bot extends TelegramLongPollingBot {
         List<InlineQueryResult> results = new ArrayList<>();
         int i = 0;
         for(SearchResult d : deezerResults){
+            String url = "https://t.me/" + c.getBot_username() + "?start=" +
+                    Base64.getEncoder().encodeToString(d.getLink().getBytes());
             InlineQueryResultArticle article = new InlineQueryResultArticle();
             InputTextMessageContent messageContent = new InputTextMessageContent();
-            messageContent.disableWebPagePreview();
+            //messageContent.disableWebPagePreview();
             messageContent.enableMarkdown(true);
-            messageContent.setMessageText(
-                    "https://t.me/" + c.getBot_username() + "?start=" +
-                    Base64.getEncoder().encodeToString(d.getLink().getBytes())
-            );
+            messageContent.setMessageText(d.getLink());
             article.setInputMessageContent(messageContent);
             article.setId(Integer.toString(i));
             article.setTitle(d.getTitle());
             article.setDescription(d.getArtist().getName());
             article.setThumbUrl(d.getAlbum().getCover_medium());
+            article.setReplyMarkup(
+                    ReplyKeyboardBuilder
+                            .createInline()
+                            .row()
+                            .addUrl(EmojiParser.parseToUnicode(":arrow_down: Download"),url)
+                            .row()
+                            .build()
+            );
             results.add(article);
             i++;
         }

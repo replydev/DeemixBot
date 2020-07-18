@@ -1,12 +1,14 @@
 package me.reply.deemixbot.bot;
 
 import com.vdurmont.emoji.EmojiParser;
+import com.wrapper.spotify.exceptions.SpotifyWebApiException;
 import me.reply.deemixbot.api.SearchResult;
 import me.reply.deemixbot.spotify.SpotifyPlaylistChecker;
 import me.reply.deemixbot.users.DownloadMode;
 import me.reply.deemixbot.users.User;
 import me.reply.deemixbot.users.UserManager;
 import me.reply.deemixbot.utils.ReplyKeyboardBuilder;
+import org.apache.hc.core5.http.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -23,6 +25,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -106,8 +109,16 @@ public class Bot extends TelegramLongPollingBot {
             currentUser.startAntiFlood();
             if(isLink(text)) {
                 if(isSpotifyLink(text)){
-                    SpotifyPlaylistChecker spotifyPlaylistChecker = new SpotifyPlaylistChecker(text,c);
-                    if(!spotifyPlaylistChecker.isReasonable()){
+                    SpotifyPlaylistChecker spotifyPlaylistChecker = null;
+                    try {
+                        spotifyPlaylistChecker = new SpotifyPlaylistChecker(text,c);
+                    } catch (ParseException | SpotifyWebApiException | IOException e) {
+                        logger.error(e.getMessage());
+                        if(c.isDebug_mode())
+                            e.printStackTrace();
+                    }
+
+                    if(!(spotifyPlaylistChecker != null && spotifyPlaylistChecker.isReasonable())){
                         sendMessage(":x: Playlist contains too many tracks, only 100 or less are supported.",chat_id);
                         return;
                     }

@@ -2,7 +2,9 @@ package me.reply.deemixbot.spotify;
 
 import com.wrapper.spotify.SpotifyApi;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
+import com.wrapper.spotify.model_objects.credentials.ClientCredentials;
 import com.wrapper.spotify.model_objects.specification.Playlist;
+import com.wrapper.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 import com.wrapper.spotify.requests.data.playlists.GetPlaylistRequest;
 import me.reply.deemixbot.bot.Config;
 import org.apache.hc.core5.http.ParseException;
@@ -18,15 +20,21 @@ public class SpotifyPlaylistChecker {
     private final Config c;
     //private static final String accessToken = "";
 
-    public SpotifyPlaylistChecker(String link, Config c){  //3AGOiaoRXMSjswCLtuNqv5
+    public SpotifyPlaylistChecker(String link, Config c) throws ParseException, SpotifyWebApiException, IOException {  //3AGOiaoRXMSjswCLtuNqv5
         this.c = c;
         String playlistId = link.substring(link.lastIndexOf('/') + 1);
 
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
                 .setClientId(c.getSpotifyClientId())
                 .setClientSecret(c.getSpotify_client_secret())
-                .setRedirectUri(null)
                 .build();
+
+        ClientCredentialsRequest clientCredentialsRequest = spotifyApi.clientCredentials()
+                .build();
+
+        final ClientCredentials clientCredentials = clientCredentialsRequest.execute();
+
+        spotifyApi.setAccessToken(clientCredentials.getAccessToken());
 
         getPlaylistRequest = spotifyApi.getPlaylist(playlistId).build();
     }

@@ -16,6 +16,7 @@ public class Config {
     private final int anti_flood_cooldown;
     private final int kill_python_process_cooldown;
     private final String python_executable;
+    private final int save_users_list_cooldown;
     private final boolean debug_mode;
     private static final String CONFIG_FILENAME = "deemix_bot_config.json";
 
@@ -30,6 +31,7 @@ public class Config {
                    String bot_username,
                    int kill_python_process_cooldown,
                    String python_executable,
+                   int save_users_list_cooldown,
                    int anti_flood_cooldown,
                    boolean debug_mode
     ){
@@ -40,6 +42,7 @@ public class Config {
         this.bot_username = bot_username;
         this.kill_python_process_cooldown = kill_python_process_cooldown;
         this.python_executable = python_executable;
+        this.save_users_list_cooldown = save_users_list_cooldown;
         this.anti_flood_cooldown = anti_flood_cooldown;
         this.debug_mode = debug_mode;
     }
@@ -62,6 +65,7 @@ public class Config {
                 "  \"bot_username\": \"bot_username_here\",\n" +
                 "  \"kill_python_process_cooldown\": 5000,\n" +
                 "  \"python_executable\": 5000,\n" +
+                "  \"save_users_list_cooldown\": 86400000,\n" +
                 "  \"anti_flood_cooldown\": \"python3\",\n" +
                 "  \"debug_mode\": false\n" +
                 "}";
@@ -98,5 +102,9 @@ public class Config {
 
     public int getKill_python_process_cooldown() {
         return kill_python_process_cooldown;
+    }
+
+    public int getSave_users_list_cooldown() {
+        return save_users_list_cooldown;
     }
 }

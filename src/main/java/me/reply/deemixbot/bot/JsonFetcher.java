@@ -6,7 +6,7 @@ import me.reply.deemixbot.api.SearchResult;
 
 import java.util.concurrent.Callable;
 
-public class JsonFetcher implements Callable<SearchResult> {
+public class JsonFetcher implements Callable<SearchResult[]> {
 
     private final String text;
 
@@ -15,13 +15,13 @@ public class JsonFetcher implements Callable<SearchResult> {
     }
 
     @Override
-    public SearchResult call() throws Exception {
+    public SearchResult[] call() throws Exception {
         DeezerApiJson deezerApiJson = Deezer.search(text);
         if(deezerApiJson == null)
             return null;
         if(deezerApiJson.getTotal() <= 0){
             return null;
         }
-        else return deezerApiJson.getSearchResults()[0];
+        else return deezerApiJson.getSearchResults();
     }
 }

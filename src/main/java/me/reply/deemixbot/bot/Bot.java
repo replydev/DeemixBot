@@ -38,9 +38,9 @@ public class Bot extends TelegramLongPollingBot {
         return instance;
     }
 
-    public Bot(Config c){
+    public Bot(Config c,UserManager userManager){
         instance = this;
-        userManager = new UserManager();
+        this.userManager = userManager;
         commandHandler = new CommandHandler();
         this.c = c;
         executorService = Executors.newFixedThreadPool(100);
@@ -102,14 +102,15 @@ public class Bot extends TelegramLongPollingBot {
             }
             else{
                 try {
-                    Future<SearchResult> resultFuture = executorService.submit(new JsonFetcher(text));
-                    SearchResult firstElement = resultFuture.get();
-                    if(firstElement == null) {
+                    Future<SearchResult[]> resultFuture = executorService.submit(new JsonFetcher(text));
+                    SearchResult[] results = resultFuture.get();
+                    if(results == null) {
                         sendMessage(":x: No results...", chat_id);
                         return;
                     }
                     else
                         sendMessage(":white_check_mark: I'm downloading your music, please wait...",chat_id);
+                    SearchResult firstElement = results[0];
 
                     DownloadMode userDownloadMode = userManager.getMode(user_id);
                     switch (userDownloadMode){

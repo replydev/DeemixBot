@@ -2,6 +2,8 @@ package me.reply.deemixbot;
 
 import me.reply.deemixbot.bot.Bot;
 import me.reply.deemixbot.bot.Config;
+import me.reply.deemixbot.bot.InlineBot;
+import me.reply.deemixbot.users.UserManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.ApiContextInitializer;
@@ -23,8 +25,10 @@ public class Main {
             logger.error("Error during config loading: " + e.getMessage());
             return;
         }
+        UserManager userManager = new UserManager();
         try {
-            telegramBotsApi.registerBot(new Bot(c));
+            telegramBotsApi.registerBot(new Bot(c,userManager));
+            telegramBotsApi.registerBot(new InlineBot(c,userManager));
         } catch (TelegramApiRequestException e) {
             e.printStackTrace();
             logger.error(e.getMessage());

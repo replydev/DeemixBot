@@ -1,24 +1,30 @@
 package me.reply.deemixbot.bot;
 
 import com.vdurmont.emoji.EmojiParser;
-import com.wrapper.spotify.model_objects.specification.Playlist;
 import me.reply.deemixbot.api.SearchResult;
 import me.reply.deemixbot.spotify.SpotifyPlaylistChecker;
-import me.reply.deemixbot.users.DownloadMode;
 import me.reply.deemixbot.users.User;
 import me.reply.deemixbot.users.UserManager;
 import me.reply.deemixbot.utils.ReplyKeyboardBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.inlinequery.InlineQuery;
+import org.telegram.telegrambots.meta.api.objects.inlinequery.inputmessagecontent.InputTextMessageContent;
+import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
+import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResultArticle;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,6 +37,7 @@ public class Bot extends TelegramLongPollingBot {
     private final UserManager userManager;
     private final CommandHandler commandHandler;
     private static final Logger logger = LoggerFactory.getLogger(Bot.class);
+    private static final int CACHETIME = 3600;
 
     private final ExecutorService executorService;
 
@@ -51,7 +58,10 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     public void onUpdateReceived(Update update) {
-        if(update.hasMessage()){
+        if (update.hasInlineQuery()) {
+            handleIncomingInlineQuery(update.getInlineQuery());
+        }
+        else if(update.hasMessage()){
             String text = update.getMessage().getText();
             if(text == null)
                 return;
@@ -69,7 +79,11 @@ public class Bot extends TelegramLongPollingBot {
             if(commandHandler.handle(text,chat_id,user_id)) //if the user has typed a known command
                 return;
 
-            if(text.startsWith("/")){
+            if(text.startsWith("/start")){
+                text = text.substring(7); // remove "/start"  to the query
+                text = new String(Base64.getDecoder().decode(text));
+            }
+            else if(text.startsWith("/")){
                 sendMessage(":x: Unknown command.",chat_id);
                 return;
             }
@@ -99,32 +113,6 @@ public class Bot extends TelegramLongPollingBot {
                 }
                 executorService.submit(new DownloadJob(text, chat_id, c,currentUser));
                 sendMessage(":white_check_mark: I'm downloading your music, please wait...",chat_id);
-            }
-            else{
-                try {
-                    Future<SearchResult[]> resultFuture = executorService.submit(new JsonFetcher(text));
-                    SearchResult[] results = resultFuture.get();
-                    if(results == null) {
-                        sendMessage(":x: No results...", chat_id);
-                        return;
-                    }
-                    else
-                        sendMessage(":white_check_mark: I'm downloading your music, please wait...",chat_id);
-                    SearchResult firstElement = results[0];
-
-                    DownloadMode userDownloadMode = userManager.getMode(user_id);
-                    switch (userDownloadMode){
-                        case ALBUM:
-                            executorService.submit(new DownloadJob(firstElement.getAlbum().getLink(),chat_id,c,currentUser));
-                            break;
-                        case TRACK:
-                            executorService.submit(new DownloadJob(firstElement.getLink(),chat_id,c,currentUser));
-                            break;
-                    }
-                } catch (InterruptedException | ExecutionException e) {
-                    logger.error(e.getMessage());
-                    e.printStackTrace();
-                }
             }
         }
     }
@@ -211,5 +199,54 @@ public class Bot extends TelegramLongPollingBot {
             logger.error(e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void handleIncomingInlineQuery(InlineQuery inlineQuery) {
+        String query = inlineQuery.getQuery();
+        logger.debug("Searching: " + query);
+        try {
+            if (!query.isEmpty()) {
+                Future<SearchResult[]> resultFuture = executorService.submit(new JsonFetcher(query));
+                SearchResult[] results = resultFuture.get();
+                execute(convertResultsToResponse(inlineQuery, results));
+            } else {
+                execute(convertResultsToResponse(inlineQuery, new SearchResult[]{})); // send empty answer
+            }
+        } catch (TelegramApiException | InterruptedException | ExecutionException e) {
+            logger.error(e.getMessage());
+            if(c.isDebug_mode())
+                e.printStackTrace();
+        }
+    }
+
+    private AnswerInlineQuery convertResultsToResponse(InlineQuery inlineQuery, SearchResult[] results) {
+        AnswerInlineQuery answerInlineQuery = new AnswerInlineQuery();
+        answerInlineQuery.setInlineQueryId(inlineQuery.getId());
+        answerInlineQuery.setCacheTime(CACHETIME);
+        answerInlineQuery.setResults(convertDeezerResultsToInline(results));
+        return answerInlineQuery;
+    }
+
+    private List<InlineQueryResult> convertDeezerResultsToInline(SearchResult[] deezerResults){
+        List<InlineQueryResult> results = new ArrayList<>();
+        int i = 0;
+        for(SearchResult d : deezerResults){
+            InlineQueryResultArticle article = new InlineQueryResultArticle();
+            InputTextMessageContent messageContent = new InputTextMessageContent();
+            messageContent.disableWebPagePreview();
+            messageContent.enableMarkdown(true);
+            messageContent.setMessageText(
+                    "https://t.me/" + c.getBot_username() + "?start=" +
+                    Base64.getEncoder().encodeToString(d.getLink().getBytes())
+            );
+            article.setInputMessageContent(messageContent);
+            article.setId(Integer.toString(i));
+            article.setTitle(d.getTitle());
+            article.setDescription(d.getArtist().getName());
+            article.setThumbUrl(d.getAlbum().getCover_medium());
+            results.add(article);
+            i++;
+        }
+        return results;
     }
 }

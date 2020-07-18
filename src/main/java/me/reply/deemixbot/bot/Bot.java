@@ -79,7 +79,11 @@ public class Bot extends TelegramLongPollingBot {
             if(commandHandler.handle(text,chat_id,user_id)) //if the user has typed a known command
                 return;
 
-            if(text.startsWith("/start")){
+            if(text.startsWith("https://t.me")){ // text has used inline bot in private chat
+                text = text.substring(text.indexOf('=') + 1);
+                text = new String(Base64.getDecoder().decode(text));
+            }
+            else if(text.startsWith("/start")){
                 text = text.substring(7); // remove "/start"  to the query
                 text = new String(Base64.getDecoder().decode(text));
             }

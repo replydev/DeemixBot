@@ -202,7 +202,7 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     private void handleIncomingInlineQuery(InlineQuery inlineQuery) {
-        String query = inlineQuery.getQuery();
+        String query = EmojiParser.removeAllEmojis(inlineQuery.getQuery());
         logger.debug("Searching: " + query);
         try {
             if (!query.isEmpty()) {

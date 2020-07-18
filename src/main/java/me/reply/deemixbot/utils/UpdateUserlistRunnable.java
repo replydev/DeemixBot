@@ -34,7 +34,7 @@ public class UpdateUserlistRunnable implements Runnable{
             File f;
 
             do{
-                f = new File("users" + i + ".txt");
+                f = new File("users" + i + ".json");
                 i++;
             }
             while (f.exists());

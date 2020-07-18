@@ -29,10 +29,16 @@ public class UpdateUserlistRunnable implements Runnable{
             return;
         }
         while(run){
+            try {
+                Thread.sleep(c.getSave_users_list_cooldown());
+            } catch (InterruptedException e) {
+                logger.error(e.getMessage());
+                if(c.isDebug_mode())
+                    e.printStackTrace();
+            }
             Gson g = new Gson();
             int i = 0;
             File f;
-
             do{
                 f = new File("users" + i + ".json");
                 i++;
@@ -43,13 +49,6 @@ public class UpdateUserlistRunnable implements Runnable{
             try {
                 FileUtils.write(f,json, StandardCharsets.UTF_8);
             } catch (IOException e) {
-                logger.error(e.getMessage());
-                if(c.isDebug_mode())
-                    e.printStackTrace();
-            }
-            try {
-                Thread.sleep(c.getSave_users_list_cooldown());
-            } catch (InterruptedException e) {
                 logger.error(e.getMessage());
                 if(c.isDebug_mode())
                     e.printStackTrace();

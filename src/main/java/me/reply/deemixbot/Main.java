@@ -28,13 +28,13 @@ public class Main {
             return;
         }
         UserManager userManager = new UserManager();
-        ExecutorService service = Executors.newSingleThreadExecutor();
-        service.execute(new UpdateUserlistRunnable(c));
         try {
             telegramBotsApi.registerBot(new Bot(c,userManager));
         } catch (TelegramApiRequestException e) {
             e.printStackTrace();
             logger.error(e.getMessage());
         }
+        ExecutorService service = Executors.newSingleThreadExecutor();
+        service.execute(new UpdateUserlistRunnable(c));
     }
 }

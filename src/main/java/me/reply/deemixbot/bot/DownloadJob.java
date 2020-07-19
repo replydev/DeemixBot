@@ -45,7 +45,7 @@ public class DownloadJob implements Runnable{
             logger.error("Error during download job execution: " + e.getMessage());
             e.printStackTrace();
         }finally {
-            Bot.getInstance().sendMessage(":white_check_mark: I'm done.",chat_id);
+            Bot.getInstance().sendMessage(":white_check_mark: I'm done.\nType /bug if you faced any bug.",chat_id);
         }
     }
 

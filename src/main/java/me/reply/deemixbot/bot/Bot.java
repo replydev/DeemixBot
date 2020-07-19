@@ -128,7 +128,7 @@ public class Bot extends TelegramLongPollingBot {
                     return;
                 }
                 executorService.submit(new DownloadJob(text, chat_id, c,currentUser));
-                sendMessage(":white_check_mark: I'm downloading your music, please wait...",chat_id);
+                sendMessage(":arrow_down: I'm downloading your music, please wait...",chat_id);
             }
             else{
                 try {
@@ -139,7 +139,7 @@ public class Bot extends TelegramLongPollingBot {
                         return;
                     }
                     else
-                        sendMessage(":white_check_mark: I'm downloading your music, please wait...",chat_id);
+                        sendMessage(":arrow_down: I'm downloading your music, please wait...",chat_id);
 
                     SearchResult firstElement = results[0];
                     DownloadMode userDownloadMode = userManager.getMode(user_id);

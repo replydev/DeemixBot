@@ -16,7 +16,7 @@ public class CommandHandler {
                 Bot.getInstance().sendMessage("To start, just type a song or album name",chat_id);
                 return true;
             case "/bug":
-                Bot.getInstance().sendKeyboard("DeemixBot is still in beta phase, so it's normal that there are some inconveniences, such as unsent music or other problems. If you want to report a bug do so via Github issues at https://github.com/replydev/DeemixBot/issues, taking care to specify the type of bug and how to replicate it. I will do my best to fix it as soon as possible. Thanks for your help!",chat_id);
+                Bot.getInstance().sendKeyboard("DeemixBot is still in beta phase, so it's normal that there are some inconveniences, such as unsent music or other problems. \n\nIf you want to report a bug do so via Github issues at https://github.com/replydev/DeemixBot/issues, taking care to specify the type of bug and how to replicate it. \n\nI will do my best to fix it as soon as possible. Thanks for your help!",chat_id);
                 return true;
             case ":cd: Track mode":
                 Bot.getInstance().getUserManager().setMode(userId, DownloadMode.TRACK);

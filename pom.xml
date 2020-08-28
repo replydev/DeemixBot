@@ -27,7 +27,7 @@
         <dependency>
             <groupId>org.telegram</groupId>
             <artifactId>telegrambots</artifactId>
-            <version>4.9</version>
+            <version>4.9.1</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -37,7 +37,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.30</version>
+            <version>2.0.0-alpha1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.0-alpha1</version>
         </dependency>
         <dependency>
             <groupId>com.vdurmont</groupId>
@@ -47,7 +52,7 @@
         <dependency>
             <groupId>com.github.thelinmichael</groupId>
             <artifactId>spotify-web-api-java</artifactId>
-            <version>6.1.0</version>
+            <version>6.3.0</version>
         </dependency>
     </dependencies>
 

@@ -1,8 +1,8 @@
 package me.reply.deemixbot.bot;
 
 import me.reply.deemixbot.api.Deezer;
-import me.reply.deemixbot.api.DeezerApiJson;
-import me.reply.deemixbot.api.SearchResult;
+import me.reply.deemixbot.api.json.DeezerQueryJson;
+import me.reply.deemixbot.api.json.SearchResult;
 
 import java.util.concurrent.Callable;
 
@@ -16,12 +16,11 @@ public class JsonFetcher implements Callable<SearchResult[]> {
 
     @Override
     public SearchResult[] call() throws Exception {
-        DeezerApiJson deezerApiJson = Deezer.search(text);
-        if(deezerApiJson == null)
+        DeezerQueryJson deezerQueryJson = Deezer.getQuery(text);
+        if(deezerQueryJson == null)
             return null;
-        if(deezerApiJson.getTotal() <= 0){
+        if(deezerQueryJson.getTotal() <= 0)
             return null;
-        }
-        else return deezerApiJson.getSearchResults();
+        else return deezerQueryJson.getSearchResults();
     }
 }

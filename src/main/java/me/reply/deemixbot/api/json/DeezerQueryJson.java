@@ -1,7 +1,7 @@
-package me.reply.deemixbot.api;
+package me.reply.deemixbot.api.json;
 
 @SuppressWarnings("unused")
-public class DeezerApiJson{
+public class DeezerQueryJson {
     private SearchResult[] data;
     private int total;
 

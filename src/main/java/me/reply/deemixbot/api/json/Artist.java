@@ -1,4 +1,4 @@
-package me.reply.deemixbot.api;
+package me.reply.deemixbot.api.json;
 
 @SuppressWarnings("unused")
 public class Artist{

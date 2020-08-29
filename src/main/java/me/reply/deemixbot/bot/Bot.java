@@ -2,8 +2,9 @@ package me.reply.deemixbot.bot;
 
 import com.vdurmont.emoji.EmojiParser;
 import com.wrapper.spotify.exceptions.SpotifyWebApiException;
-import me.reply.deemixbot.api.SearchResult;
-import me.reply.deemixbot.spotify.SpotifyPlaylistChecker;
+import me.reply.deemixbot.playlistchecker.DeezerPlaylistChecker;
+import me.reply.deemixbot.api.json.SearchResult;
+import me.reply.deemixbot.playlistchecker.SpotifyPlaylistChecker;
 import me.reply.deemixbot.users.DownloadMode;
 import me.reply.deemixbot.users.User;
 import me.reply.deemixbot.users.UserManager;
@@ -26,6 +27,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -123,12 +125,26 @@ public class Bot extends TelegramLongPollingBot {
                         return;
                     }
                 }
-                else if(!isDeezerLink(text)){
-                    sendMessage(":x: This link is not compatible.",chat_id);
+                else if(isDeezerLink(text)){
+                    if(isDeezerPlaylist(text)){
+                        DeezerPlaylistChecker deezerPlaylistChecker = new DeezerPlaylistChecker(text,c);
+                        try {
+                            if(!deezerPlaylistChecker.isReasonable()){
+                                sendMessage(":x: Playlist contains too many tracks, only 100 or less are supported.",chat_id);
+                                return;
+                            }
+                        } catch (MalformedURLException e) {
+                            logger.error(e.getMessage());
+                            if(c.isDebug_mode())
+                                e.printStackTrace();
+                            return;
+                        }
+                    }
+                    executorService.submit(new DownloadJob(text, chat_id, c,currentUser));
+                    sendMessage(":arrow_down: I'm downloading your music, please wait...",chat_id);
                     return;
                 }
-                executorService.submit(new DownloadJob(text, chat_id, c,currentUser));
-                sendMessage(":arrow_down: I'm downloading your music, please wait...",chat_id);
+                sendMessage(":x: This link is not compatible.",chat_id);
             }
             else{
                 try {
@@ -212,6 +228,12 @@ public class Bot extends TelegramLongPollingBot {
 
     private boolean isDeezerLink(String link){
         return link.startsWith("https://www.deezer.com/");
+    }
+
+    private boolean isDeezerPlaylist(String link){
+        if(!isDeezerLink(link))
+            return false;
+        return link.contains("/playlist/");
     }
 
     private boolean isSpotifyLink(String link){
